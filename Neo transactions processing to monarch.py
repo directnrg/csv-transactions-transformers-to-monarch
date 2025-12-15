@@ -436,7 +436,7 @@ def process_csv(df, column_position, mapping):
     # since the initial copy (this makes the operation idempotent in a single
     # run and prevents later keywords from overwriting earlier matches).
     target_col_name = df.columns[column_position]
-    for kw, category in sorted_keywords:
+    for kw, mapping_key in sorted_keywords:
         # Use lookarounds rather than \b to correctly handle non-word chars
         pattern = r"(?<!\w)" + re.escape(kw) + r"(?!\w)"
         # Match against either the original statement or the original
@@ -450,32 +450,28 @@ def process_csv(df, column_position, mapping):
         still_original_mask = df.iloc[:, column_position].isna() | (df.iloc[:, column_position] == pre_target)
         apply_mask = match_mask & still_original_mask
         if apply_mask.any():
-            df.loc[apply_mask, target_col_name] = category
+            # Explicitly assign the mapping key (category name from our
+            # `keyword_mapping` dictionary). We'll normalize casing later.
+            df.loc[apply_mask, target_col_name] = mapping_key
 
     return df
 
 
 def normalize_category(category):
-    """Normalize category names by removing underscores and applying title case.
-    
-    Rules:
-    - Remove underscores and split by them
-    - Capitalize the first letter of each word
-    
-    Examples:
-    - "PHARMACY" -> "Pharmacy"
-    - "HEALTH_WELLNESS" -> "Health Wellness"
-    - "grocery" -> "Grocery"
-    - "specialty_foods" -> "Specialty Foods"
+    """Normalize category names by removing underscores, collapsing spaces,
+    and applying Title Case to each word.
+
+    This ensures the final CSV uses consistent Title Case category labels.
     """
     if pd.isna(category):
         return category
-    
-    category_str = str(category).strip()
-    parts = category_str.split('_')
-    
-    # Title case each word
-    return ' '.join(word.capitalize() for word in parts)
+
+    # Replace underscores with spaces, collapse multiple spaces, strip edges
+    category_str = str(category).replace("_", " ")
+    category_str = " ".join(category_str.split())
+
+    # Apply Title Case for consistent labeling
+    return category_str.title()
 
 
 # Main execution flow
