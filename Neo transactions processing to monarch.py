@@ -8,17 +8,16 @@ keyword_mapping = {
     "Business Income": ["business", "corporate", "profit"],
     "Other Income": ["other income", "miscellaneous"],
     "Returned Purchase": ["returned", "refund", "canceled", "reverse"],
-    "Employment Insurance": ["insurance", "employment", "jobless"],
+    "Insurance": ["insurance", "employment", "jobless"],
     "Subscriptions": ["subscription", "recurring", "service", "membership"],
     "Charity": ["charity", "donation", "nonprofit", "aid"],
     "Gifts": ["gift", "present", "reward"],
     "Auto Payment": ["auto", "car", "vehicle"],
-    "Public Transit": ["transit", "bus", "train", "metro"],
     "Gas": ["gas", "fuel", "petrol"],
     "Auto Maintenance": ["maintenance", "repair", "car service"],
     "Parking & Tolls": ["parking", "toll", "pass", "fee", "honk parking"],
     "Mortgage": ["mortgage", "house loan", "property loan"],
-    "Household": ["dollarama", "household", "home supplies", "cleaning"],
+    "Household": ["household", "home supplies", "cleaning"],
     "Rent": ["rent", "lease"],
     "Home Improvement": ["home", "improvement", "renovation", "furniture"],
     "Water": ["water", "utility"],
@@ -35,6 +34,7 @@ keyword_mapping = {
         "especialty foods",
         "freshco",
         "food basics",
+        "costco",
         "metro",
         "loblaws",
         "longos",
@@ -75,7 +75,6 @@ keyword_mapping = {
         "restaurant",
         "bar",
         "dine",
-        "cafe",
         "eatery",
         "beer",
         "wine",
@@ -83,13 +82,12 @@ keyword_mapping = {
         "sunset grill",
         "pub",
         "mad radish",
-        "chick-fil-a",
         "shake shack",
         "jimmy the greek",
         "cafe landwer",
         "kitchen market",
         "eggsmart",
-        "vereda",
+        "vereda"
     ],
     "Delivery": ["delivery", "food delivery", "takeout", "food order"],
     "Coffee Shops": [
@@ -112,7 +110,7 @@ keyword_mapping = {
         "pizza",
         "fries",
         "McDonald's",
-        "MCDONALD'S" "KFC",
+        "KFC",
         "Taco Bell",
         "Subway",
         "Wendy's",
@@ -138,28 +136,6 @@ keyword_mapping = {
         "happy sundae",
     ],
     "Travel & Vacation": ["travel", "vacation", "trip", "holiday", "flights"],
-    "Entertainment & Recreation": [
-        "entertainment",
-        "fun",
-        "movies",
-        "games",
-        "attractions",
-        "hobbies",
-        "photography",
-        "performing arts",
-        "amusement parks",
-        "eventbrite",
-        "kids fun town",
-        "cineplex",
-        "famous player",
-        "the rec room",
-        "zed*80",
-        "snakes & lattes",
-        "performing arts",
-        "gamestop",
-        "village vacances",
-        "wonderland",
-    ],
     "Beauty": [
         "beauty",
         "salon",
@@ -191,7 +167,7 @@ keyword_mapping = {
         "treatment",
         "wellness services",
     ],
-    "Personal": ["personal", "individual", "miscellaneous"],
+    "Personal": ["personal", "individual"],
     "Pets": ["pet", "animal", "dog", "cat"],
     "Fun Money": ["fun", "leisure", "hobby"],
     "Shopping": [
@@ -203,16 +179,13 @@ keyword_mapping = {
         "walmart",
         "wal-mart",
         "best buy",
-        "costco",
         "target",
         "AMZ",
         "winners",
         "marshalls",
         "dollarama",
         "value village",
-        "miniso",
         "lucky mart",
-        "international news",
         "bath & body works",
         "absolute dollar",
         "deserres",
@@ -241,13 +214,6 @@ keyword_mapping = {
         "old navy",
         "OLDNAVY.COM" "ardene",
     ],
-    "Furniture & Housewares": [
-        "furniture",
-        "housewares",
-        "decor",
-        "home goods",
-        "home garden",
-    ],
     "Child Care": [
         "child",
         "baby",
@@ -257,7 +223,7 @@ keyword_mapping = {
         "nursery",
         "babysitting",
     ],
-    "Child Activities": ["child activities", "toys", "play", "games"],
+    "Child Activities": ["child activities", "toys", "play"],
     "Student Loans": ["student loans", "education loan"],
     "Education": [
         "education",
@@ -271,18 +237,15 @@ keyword_mapping = {
     ],
     "Medical": [
         "medical",
-        "health",
         "pharmacy",
         "hospital",
         "doctor",
-        "therapy",
         "medication",
         "prescription",
         "pharma",
         "medicine",
     ],
     "Dentist": ["dentist", "teeth", "oral", "dentals"],
-    "Fitness": ["fitness", "gym", "sporting", "exercise"],
     "Loan Repayment": ["loan", "repayment"],
     "Financial & Legal Services": [
         "financial",
@@ -294,27 +257,39 @@ keyword_mapping = {
     ],
     "Financial Fees": ["fees", "charges", "account fees"],
     "Cash & ATMS": ["cash", "atm"],
-    "Insurance": ["insurance", "policy"],
     "Taxes": ["taxes", "tax payment", "bridge commission"],
     "Uncategorized": ["uncategorized", "unknown"],
-    "Miscellaneous": ["miscellaneous", "other"],
+    "Miscellaneous": ["miscellaneous expense", "other"],
     "Friendly Loans": ["friendly loans", "family loans", "personal loans"],
     "FD Expenses": ["FD", "fixed deposit expenses"],
     "Advertising & Promotion": ["advertising", "promotion", "marketing"],
-    "Business Utilities & Communication": [
-        "business utilities",
-        "internet",
-        "phone",
-        "cable",
-    ],
-    "Employee Wages & Contract Labor": ["employee wages", "salary", "contract labor"],
+    "Employee Wages & Contract Labor": ["employee wages", "business salary", "contract labor"],
     "Business Travels & Meals": ["business travel", "meals", "trips"],
-    "Business Auto Expenses": ["business auto", "vehicle", "car"],
+    "Business Auto Expenses": ["business auto", "business vehicle", "business car"],
     "Business Insurance": ["business insurance", "company policy"],
     "Business Supplies & Expenses": ["supplies", "business expenses"],
-    "Office Rent": ["office", "rent", "lease"],
+    "Office Rent": ["office", "business rent", "business lease"],
     "Postage & Shipping": ["postage", "shipping", "courier"],
     "Video Games": ["games", "video games", "playstation", "xbox"],
+    "Entertainment & Recreation": [
+        "entertainment",
+        "movies",
+        "attractions",
+        "hobbies",
+        "photography",
+        "amusement parks",
+        "eventbrite",
+        "kids fun town",
+        "cineplex",
+        "famous player",
+        "the rec room",
+        "zed*80",
+        "snakes & lattes",
+        "performing arts",
+        "gamestop",
+        "village vacances",
+        "wonderland",
+    ],
     "Entertainment Subscriptions": [
         "video series",
         "games membership",
@@ -323,16 +298,15 @@ keyword_mapping = {
         "PSN",
         "Xbox Live",
         "Netflix",
+        "Netflix.com"
         "Hulu",
         "Disney+",
     ],
     "SaaS Subscriptions": [
         "software",
         "apps",
-        "devices",
         "app",
         "blink",
-        "openAI",
         "microsoft 365",
         "skillsyncer",
         "chatgpt",
@@ -348,7 +322,6 @@ keyword_mapping = {
         "gadgets",
         "devices",
         "apple store",
-        "best buy",
         "staples",
     ],
     "Transfer": ["transfer", "movement", "funds", "money request"],
@@ -358,7 +331,6 @@ keyword_mapping = {
         "transit",
         "bus",
         "train",
-        "metro",
         "lyft",
         "ttc",
         "presto",
@@ -366,7 +338,6 @@ keyword_mapping = {
         "taxi",
         "ride share",
         "Uber",
-        "lyft",
         "hopp",
         "beck taxi",
     ],
@@ -416,32 +387,95 @@ def transform_file(df, account_name):
 def process_csv(df, column_position, mapping):
     print(f"Processing column at position: {column_position}")
 
-    # Create a sorted list of (keyword, category) tuples
-    sorted_keywords = sorted(
-        ((kw, cat) for cat, keywords in mapping.items() for kw in keywords),
-        key=lambda x: -len(x[0]),  # Sort by keyword length (longer first)
-    )
+    """Map descriptions to categories using `mapping`.
 
-    # Copy values from column 4 (index 3) to column 2 (index 1)
-    df.iloc[:, column_position] = df.iloc[
-        :, 4
-    ]  # Assuming the category column is at position 2 (index 1)
-
-    # Vectorized replacement
+    Behavior and improvements:
+    - Build a single keyword -> category map preserving the first-seen category
+      to avoid ambiguous duplicate keywords across categories.
+    - Use lookaround anchors so keywords with non-word characters are matched
+      correctly (e.g. "C#", "3.14").
+    - Ensure idempotency: once a row's target column is changed from the
+      original description it will not be overwritten by later keywords.
+    """
     import re
 
-    def map_category(value):
-        if pd.isna(value):
-            return value
-        value_lower = str(value).lower()
-        for keyword, category in sorted_keywords:
-            pattern = r"\b" + re.escape(keyword) + r"\b"
-            if re.search(pattern, value_lower):
-                return category
-        return value
+    # Preserve the original source column (column 4) so we can test if
+    # a target cell has been changed by this process.
+    original_statement = df.iloc[:, 4].copy()
+    # Preserve the pre-mapping value of the target column (usually the
+    # original Category coming from the CSV). We'll only update rows that
+    # still equal this pre-mapping value to ensure idempotency.
+    pre_target = df.iloc[:, column_position].copy()
 
-    df.iloc[:, column_position] = df.iloc[:, column_position].apply(map_category)
+    # Build a keyword->category map, preserving first occurrence as precedence
+    keyword_to_category = {}
+    duplicates = {}
+    for category, keywords in mapping.items():
+        for kw in keywords:
+            kw_norm = str(kw).lower()
+            if kw_norm in keyword_to_category:
+                duplicates.setdefault(kw_norm, set()).add(category)
+            else:
+                keyword_to_category[kw_norm] = category
+
+    if duplicates:
+        print("Warning: duplicate keywords found across categories; using first occurrence for each:")
+        # Show up to 10 duplicate examples to avoid spamming output
+        for kw, cats in list(duplicates.items()):
+            print(f"  '{kw}' also appeared in: {', '.join(sorted(cats))}")
+
+    # Sort keywords by length (longer first) to prefer longer matches
+    sorted_keywords = sorted(keyword_to_category.items(), key=lambda x: -len(x[0]))
+
+    # Prepare lowercase series for matching from both the original
+    # statement and the original category value from the input CSV.
+    desc_lower = original_statement.fillna("").astype(str).str.lower()
+    cat_lower = pre_target.fillna("").astype(str).str.lower()
+
+    # Apply keywords in order; only assign to rows that haven't been changed
+    # since the initial copy (this makes the operation idempotent in a single
+    # run and prevents later keywords from overwriting earlier matches).
+    target_col_name = df.columns[column_position]
+    for kw, category in sorted_keywords:
+        # Use lookarounds rather than \b to correctly handle non-word chars
+        pattern = r"(?<!\w)" + re.escape(kw) + r"(?!\w)"
+        # Match against either the original statement or the original
+        # category value from the input file.
+        match_mask = (
+            desc_lower.str.contains(pattern, regex=True, na=False)
+            | cat_lower.str.contains(pattern, regex=True, na=False)
+        )
+        # Only update rows that haven't been changed since we started
+        # (i.e., they still equal the pre-mapping target value).
+        still_original_mask = df.iloc[:, column_position].isna() | (df.iloc[:, column_position] == pre_target)
+        apply_mask = match_mask & still_original_mask
+        if apply_mask.any():
+            df.loc[apply_mask, target_col_name] = category
+
     return df
+
+
+def normalize_category(category):
+    """Normalize category names by removing underscores and applying title case.
+    
+    Rules:
+    - Remove underscores and split by them
+    - Capitalize the first letter of each word
+    
+    Examples:
+    - "PHARMACY" -> "Pharmacy"
+    - "HEALTH_WELLNESS" -> "Health Wellness"
+    - "grocery" -> "Grocery"
+    - "specialty_foods" -> "Specialty Foods"
+    """
+    if pd.isna(category):
+        return category
+    
+    category_str = str(category).strip()
+    parts = category_str.split('_')
+    
+    # Title case each word
+    return ' '.join(word.capitalize() for word in parts)
 
 
 # Main execution flow
@@ -463,10 +497,11 @@ def main():
     df = transform_file(df, account_name)
 
     # Process the keyword mapping
-    column_position = (
-        2  # Assuming category column of the destination file is at position 2
-    )
+    column_position = 2  # Assuming category column of the destination file is at position 2
     df = process_csv(df, column_position, keyword_mapping)
+
+    # Normalize category names (remove underscores, apply proper capitalization)
+    df.iloc[:, column_position] = df.iloc[:, column_position].apply(normalize_category)
 
     # Save the transformed and processed file
     print(f"Processing complete. Saving to file: {output_file}")
