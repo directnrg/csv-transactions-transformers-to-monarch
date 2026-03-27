@@ -1,6 +1,8 @@
 import pandas as pd
+from pathlib import Path
+from transaction_utils import CSVLoader, CategoryMapper, CategoryNormalizer
 
-# Define the mapping of English categories and their Spanish keywords
+# Keyword mapping for Bancolombia (Spanish keywords)
 keyword_mapping = {
     "Paychecks": ["nomina", "sueldo", "salario", "pago", "honorarios"],
     "Interest": ["interes", "intereses", "ahorros", "abono intereses ahorros", "ajuste interes"],
@@ -77,104 +79,74 @@ keyword_mapping = {
     "Balance Adjustments": ["saldo", "ajustes", "correcciones", "ajuste", "ajuste interes", "ajuste interes ahorros db"]
 }
 
-# Function to transform the file into the desired format
 def transform_file(df, account_name, cop_to_cad_rate):
-    # Clean the data
+    """Transform Bancolombia CSV to standard format with currency conversion."""
     df = df.dropna(how='all')
-    
-    # Rename columns to match the desired output format
+
+    # Map columns
     df_renamed = pd.DataFrame()
-    
-    # Map original columns to new column names
     df_renamed['Date'] = df['FECHA']
     df_renamed['Merchant'] = df['DESCRIPCIÓN']
-    # Initialize Category with empty strings
     df_renamed['Category'] = ""
     df_renamed['Account'] = account_name
     df_renamed['Original Statement'] = df['DESCRIPCIÓN'] + ' ' + df['REFERENCIA'].fillna('')
-    df_renamed['Notes'] = ''
-    
-    # Process the amount column
-    df_renamed['Amount'] = df['VALOR'].apply(lambda x: str(x).replace('$', '').replace(' ', '').replace(',', ''))
-    df_renamed['Amount'] = pd.to_numeric(df_renamed['Amount'], errors='coerce')
-    
-    # Convert the amount from COP to CAD
-    df_renamed['Amount'] = df_renamed['Amount'] * cop_to_cad_rate
-    
-    # Add currency information to Notes
-    df_renamed['Notes'] = "Converted from COP to CAD (rate: " + str(cop_to_cad_rate) + ")"
-    
-    # Add original COP amount to Notes
-    df_renamed['Original_COP'] = df['VALOR'].apply(lambda x: str(x).replace('$', '').replace(' ', '').replace(',', ''))
-    df_renamed['Original_COP'] = pd.to_numeric(df_renamed['Original_COP'], errors='coerce')
-    df_renamed['Notes'] = df_renamed['Notes'] + " | Original: " + df_renamed['Original_COP'].astype(str) + " COP"
-    df_renamed.drop('Original_COP', axis=1, inplace=True)
-    
+
+    # Clean and convert amounts from COP to CAD
+    amount_cleaned = df['VALOR'].astype(str).str.replace(r'[\$\s,]', '', regex=True)
+    amount_numeric = pd.to_numeric(amount_cleaned, errors='coerce') * cop_to_cad_rate
+    df_renamed['Amount'] = amount_numeric
+
+    # Store original COP amount in notes
+    original_cop = pd.to_numeric(amount_cleaned, errors='coerce')
+    df_renamed['Notes'] = ("Converted from COP to CAD (rate: " + str(cop_to_cad_rate) +
+                          ") | Original: " + original_cop.astype(str) + " COP")
     df_renamed['Tags'] = ''
 
     return df_renamed
 
-# Function to process CSV for keyword mapping
+
 def process_csv(df, mapping):
+    """Categorize transactions using keyword mapping."""
     print("Processing categories based on descriptions...")
 
-    # Create a sorted list of (keyword, category) tuples
-    sorted_keywords = sorted(
-        ((kw, cat) for cat, keywords in mapping.items() for kw in keywords),
-        key=lambda x: -len(x[0])  # Sort by keyword length (longer first)
-    )
-
-    # Vectorized replacement
-    def map_category(value):
-        if pd.isna(value):
-            return "Uncategorized"
-        value_lower = str(value).lower()
-        for keyword, category in sorted_keywords:
-            if keyword.lower() in value_lower:
-                return category
-        return "Uncategorized"
-
-    # Use the Merchant column to determine the category
-    df['Category'] = df['Merchant'].apply(map_category)
+    mapper = CategoryMapper(mapping)
+    df['Category'] = df['Merchant'].apply(mapper.map_category)
     return df
 
-# Main execution flow
 def main():
-    input_file = input("Enter the path to the input CSV file: ")
-    output_file = input("Enter the path to save the processed CSV file (leave blank for default): ")
+    input_file = input("Enter the path to the input CSV file: ").strip('"').strip("'").strip()
+    output_file = input("Enter the path to save the processed CSV file (leave blank for default): ").strip('"').strip("'").strip()
     account_name = input("Enter the account name to fill in the Account column: ")
-    
-    # Currency conversion rate - average
+
     cop_to_cad_rate = float(0.00033333)
-    
+
     if not output_file:
         output_file = input_file.rsplit(".", 1)[0] + "_processed.csv"
 
+    # If user provided a directory path, append default filename
+    output_path = Path(output_file)
+    if output_path.is_dir() or (not output_path.suffix and output_file.endswith('\\')):
+        output_file = str(output_path / (Path(input_file).stem + "_processed.csv"))
+
     print(f"Loading file: {input_file}")
-    
+
     try:
-        # Try to load with different encodings
-        try:
-            df = pd.read_csv(input_file, encoding='utf-8')
-        except UnicodeDecodeError:
-            try:
-                df = pd.read_csv(input_file, encoding='latin1')
-            except:
-                df = pd.read_csv(input_file, encoding='cp1252')
-                
+        # Use CSVLoader for encoding detection
+        df = CSVLoader.load(input_file)
         print(f"File loaded. Number of rows: {len(df)}")
 
-        # Transform the file to the desired format
+        # Transform and categorize
         df = transform_file(df, account_name, cop_to_cad_rate)
-
-        # Process the keyword mapping
         df = process_csv(df, keyword_mapping)
 
-        # Save the transformed and processed file
+        # Normalize categories
+        df['Category'] = df['Category'].apply(CategoryNormalizer.normalize)
+
+        # Save
         print(f"Processing complete. Saving to file: {output_file}")
         df.to_csv(output_file, index=False)
         print(f"File saved: {output_file}")
-        
+
     except Exception as e:
         print(f"Error processing file: {e}")
 

@@ -1,5 +1,6 @@
 import pandas as pd
-import numpy as np
+from pathlib import Path
+from transaction_utils import CSVLoader, CategoryMapper, CategoryNormalizer
 
 # Define the mapping of updated values and their keywords
 keyword_mapping = {
@@ -387,120 +388,46 @@ def transform_file(df, account_name):
 def process_csv(df, column_position, mapping):
     print(f"Processing column at position: {column_position}")
 
-    """Map descriptions to categories using `mapping`.
-
-    Behavior and improvements:
-    - Build a single keyword -> category map preserving the first-seen category
-      to avoid ambiguous duplicate keywords across categories.
-    - Use lookaround anchors so keywords with non-word characters are matched
-      correctly (e.g. "C#", "3.14").
-    - Ensure idempotency: once a row's target column is changed from the
-      original description it will not be overwritten by later keywords.
-    """
-    import re
-
-    # Preserve the original source column (column 4) so we can test if
-    # a target cell has been changed by this process.
+    mapper = CategoryMapper(mapping)
     original_statement = df.iloc[:, 4].copy()
-    # Preserve the pre-mapping value of the target column (usually the
-    # original Category coming from the CSV). We'll only update rows that
-    # still equal this pre-mapping value to ensure idempotency.
-    pre_target = df.iloc[:, column_position].copy()
-
-    # Build a keyword->category map, preserving first occurrence as precedence
-    keyword_to_category = {}
-    duplicates = {}
-    for category, keywords in mapping.items():
-        for kw in keywords:
-            kw_norm = str(kw).lower()
-            if kw_norm in keyword_to_category:
-                duplicates.setdefault(kw_norm, set()).add(category)
-            else:
-                keyword_to_category[kw_norm] = category
-
-    if duplicates:
-        print("Warning: duplicate keywords found across categories; using first occurrence for each:")
-        # Show up to 10 duplicate examples to avoid spamming output
-        for kw, cats in list(duplicates.items()):
-            print(f"  '{kw}' also appeared in: {', '.join(sorted(cats))}")
-
-    # Sort keywords by length (longer first) to prefer longer matches
-    sorted_keywords = sorted(keyword_to_category.items(), key=lambda x: -len(x[0]))
-
-    # Prepare lowercase series for matching from both the original
-    # statement and the original category value from the input CSV.
-    desc_lower = original_statement.fillna("").astype(str).str.lower()
-    cat_lower = pre_target.fillna("").astype(str).str.lower()
-
-    # Apply keywords in order; only assign to rows that haven't been changed
-    # since the initial copy (this makes the operation idempotent in a single
-    # run and prevents later keywords from overwriting earlier matches).
     target_col_name = df.columns[column_position]
-    for kw, mapping_key in sorted_keywords:
-        # Use lookarounds rather than \b to correctly handle non-word chars
-        pattern = r"(?<!\w)" + re.escape(kw) + r"(?!\w)"
-        # Match against either the original statement or the original
-        # category value from the input file.
-        match_mask = (
-            desc_lower.str.contains(pattern, regex=True, na=False)
-            | cat_lower.str.contains(pattern, regex=True, na=False)
-        )
-        # Only update rows that haven't been changed since we started
-        # (i.e., they still equal the pre-mapping target value).
-        still_original_mask = df.iloc[:, column_position].isna() | (df.iloc[:, column_position] == pre_target)
-        apply_mask = match_mask & still_original_mask
-        if apply_mask.any():
-            # Explicitly assign the mapping key (category name from our
-            # `keyword_mapping` dictionary). We'll normalize casing later.
-            df.loc[apply_mask, target_col_name] = mapping_key
+
+    # Map categories using the keyword mapper
+    df[target_col_name] = original_statement.apply(mapper.map_category)
 
     return df
 
 
-def normalize_category(category):
-    """Normalize category names by removing underscores, collapsing spaces,
-    and applying Title Case to each word.
-
-    This ensures the final CSV uses consistent Title Case category labels.
-    """
-    if pd.isna(category):
-        return category
-
-    # Replace underscores with spaces, collapse multiple spaces, strip edges
-    category_str = str(category).replace("_", " ")
-    category_str = " ".join(category_str.split())
-
-    # Apply Title Case for consistent labeling
-    return category_str.title()
-
-
-# Main execution flow
 def main():
-    input_file = input("Enter the path to the input CSV file: ")
-    trimmed_input_file = input_file.strip('"').strip("'")
-    input_file = trimmed_input_file
-    
+    input_file = input("Enter the path to the input CSV file: ").strip('"').strip("'").strip()
     output_file = input(
         "Enter the path to save the processed CSV file (leave blank for default): "
     )
+    output_file = output_file.strip('"').strip("'").strip()  # Remove quotes and whitespace
+
     account_name = input("Enter the account name to fill in the Account column: ")
 
     if not output_file:
         output_file = input_file.rsplit(".", 1)[0] + "_processed.csv"
 
+    # If user provided a directory path, append default filename
+    output_path = Path(output_file)
+    if output_path.is_dir() or (not output_path.suffix and output_file.endswith('\\')):
+        output_file = str(output_path / (Path(input_file).stem + "_processed.csv"))
+
     print(f"Loading file: {input_file}")
-    df = pd.read_csv(input_file)
+    df = CSVLoader.load(input_file)
     print(f"File loaded. Number of rows: {len(df)}")
 
     # Transform the file to the desired format
     df = transform_file(df, account_name)
 
     # Process the keyword mapping
-    column_position = 2  # Assuming category column of the destination file is at position 2
+    column_position = 2  # Category column position
     df = process_csv(df, column_position, keyword_mapping)
 
-    # Normalize category names (remove underscores, apply proper capitalization)
-    df.iloc[:, column_position] = df.iloc[:, column_position].apply(normalize_category)
+    # Normalize category names
+    df.iloc[:, column_position] = df.iloc[:, column_position].apply(CategoryNormalizer.normalize)
 
     # Save the transformed and processed file
     print(f"Processing complete. Saving to file: {output_file}")
