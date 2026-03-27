@@ -477,6 +477,9 @@ def normalize_category(category):
 # Main execution flow
 def main():
     input_file = input("Enter the path to the input CSV file: ")
+    trimmed_input_file = input_file.strip('"').strip("'")
+    input_file = trimmed_input_file
+    
     output_file = input(
         "Enter the path to save the processed CSV file (leave blank for default): "
     )
